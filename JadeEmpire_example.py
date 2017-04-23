@@ -1,6 +1,6 @@
 import pymem
 from time import sleep
-jadeHandle = mempy.openProcName("JadeEmpire.exe")
+jadeHandle = pymem.openProcName("JadeEmpire.exe")
 #cheataddr section
 
 #bases
@@ -18,9 +18,9 @@ zOffset.append(0x4c) #float
 
 #resolve ptr's
 def resolvePtrs():
-	x_p = mempy.resolvePointer(jadeHandle, baseptr, xOffset)
-	y_p = mempy.resolvePointer(jadeHandle, baseptr, yOffset)
-	z_p = mempy.resolvePointer(jadeHandle, baseptr, zOffset)
+	x_p = pymem.resolvePointer(jadeHandle, baseptr, xOffset)
+	y_p = pymem.resolvePointer(jadeHandle, baseptr, yOffset)
+	z_p = pymem.resolvePointer(jadeHandle, baseptr, zOffset)
 	return (x_p,y_p,z_p)
 #end
 
@@ -28,15 +28,15 @@ history = []
 ptrs_list = resolvePtrs()
 print("Recording player movement for 20 seconds")
 for i in range(2000):
-	x = mempy.readFloat(jadeHandle, ptrs_list[0])
-	y = mempy.readFloat(jadeHandle, ptrs_list[1])
-	z = mempy.readFloat(jadeHandle, ptrs_list[2])
+	x = pymem.readFloat(jadeHandle, ptrs_list[0])
+	y = pymem.readFloat(jadeHandle, ptrs_list[1])
+	z = pymem.readFloat(jadeHandle, ptrs_list[2])
 	history.append((x,y,z))
 	sleep(0.01)
 
 print("Playing movement back")
 for hist in reversed(history):
-	mempy.writeFloat(jadeHandle, ptrs_list[0],hist[0])
-	mempy.writeFloat(jadeHandle, ptrs_list[1],hist[1])	
-	mempy.writeFloat(jadeHandle, ptrs_list[2],hist[2])
+	pymem.writeFloat(jadeHandle, ptrs_list[0],hist[0])
+	pymem.writeFloat(jadeHandle, ptrs_list[1],hist[1])	
+	pymem.writeFloat(jadeHandle, ptrs_list[2],hist[2])
 	sleep(0.01)
