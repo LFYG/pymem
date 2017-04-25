@@ -1,8 +1,9 @@
+#proof of concept memory read/write module
 #external dependencies include psutil (install with pip/pip3)
 #or disable openProcName and remove psutil import
-
-import sys, ctypes, struct, psutil
-import ctypes.wintypes as wintypes
+import struct, psutil
+from ctypes import *
+from ctypes.wintypes import *
 """
 Memory read/write module for Python 3x (untested with 2x)
 Abstracts and simplifies the use of win32 api
@@ -31,8 +32,8 @@ writeFloat(procHandle, address, value)
 writeDouble(procHandle, address, value)
 writeByte(procHandle, address, value)
 writeBytes(procHandle, address, buffer)
-
-resolvePointer(procHandle, base_address, offset_list)
+resolveMultiPointer(procHandle, base_address, offset_list):
+resolvePointer(procHandle, base_address, offset):
 """
 
 #Define constants
@@ -45,18 +46,18 @@ SIZE_SHORT = 2;
 SIZE_CHAR = 1
 PROCESS_ALL_ACCESS = 0x1F0FFF
 
-#Create function references for simple use
-rPM = ctypes.WinDLL('kernel32',use_last_error=True).ReadProcessMemory
-rPM.argtypes = [wintypes.HANDLE,wintypes.LPCVOID,wintypes.LPVOID,ctypes.c_size_t,ctypes.POINTER(ctypes.c_size_t)]
-rPM.restype = wintypes.BOOL
+#Create function references
+rPM = WinDLL('kernel32',use_last_error=True).ReadProcessMemory
+rPM.argtypes = [HANDLE,LPCVOID,LPVOID,c_size_t,POINTER(c_size_t)]
+rPM.restype = BOOL
 
-wPM = ctypes.WinDLL('kernel32',use_last_error=True).WriteProcessMemory
-wPM.argtypes = [wintypes.HANDLE,wintypes.LPVOID,wintypes.LPCVOID,ctypes.c_size_t,ctypes.POINTER(ctypes.c_size_t)]
-wPM.restype = wintypes.BOOL
+wPM = WinDLL('kernel32',use_last_error=True).WriteProcessMemory
+wPM.argtypes = [HANDLE,LPVOID,LPCVOID,c_size_t,POINTER(c_size_t)]
+wPM.restype = BOOL
 
-OpenProcess = ctypes.windll.kernel32.OpenProcess
+OpenProcess = windll.kernel32.OpenProcess
 
-CloseHandle = ctypes.windll.kernel32.CloseHandle
+CloseHandle = windll.kernel32.CloseHandle
 
 def openProc(pid):
 	"""Creates a handle to the process id (pid) of the target process
@@ -83,7 +84,7 @@ def closeProc(procHandle):
 	procHandle -- handle to process
 	"""
 	CloseHandle(procHandle)
-	
+
 def readInt(procHandle, address):
 	"""Reads an int at a specified address from a process
 	Returns an int which is the value at [address]
@@ -92,10 +93,10 @@ def readInt(procHandle, address):
 	procHandle -- handle to process
 	address -- address in process to read from
 	"""
-	buffer = ctypes.create_string_buffer(SIZE_INT)
-	bytes_read = ctypes.c_size_t()
-	rPM(procHandle,address,buffer,SIZE_INT,ctypes.byref(bytes_read))
-	err = ctypes.get_last_error()
+	buffer = create_string_buffer(SIZE_INT)
+	bytes_read = c_size_t()
+	rPM(procHandle,address,buffer,SIZE_INT,byref(bytes_read))
+	err = get_last_error()
 	return struct.unpack("i",buffer[0:SIZE_INT])[0]
 	
 def readShort(procHandle, address):
@@ -106,10 +107,10 @@ def readShort(procHandle, address):
 	procHandle -- handle to process
 	address -- address in process to read from
 	"""
-	buffer = ctypes.create_string_buffer(SIZE_SHORT)
-	bytes_read = ctypes.c_size_t()
-	rPM(procHandle,address,buffer,SIZE_SHORT,ctypes.byref(bytes_read))
-	err = ctypes.get_last_error()
+	buffer = create_string_buffer(SIZE_SHORT)
+	bytes_read = c_size_t()
+	rPM(procHandle,address,buffer,SIZE_SHORT,byref(bytes_read))
+	err = get_last_error()
 	return struct.unpack("h",buffer[0:SIZE_SHORT])[0]
 	
 def readByte(procHandle, address):
@@ -120,10 +121,10 @@ def readByte(procHandle, address):
 	procHandle -- handle to process
 	address -- address in process to read from
 	"""
-	buffer = ctypes.create_string_buffer(SIZE_CHAR)
-	bytes_read = ctypes.c_size_t()
-	rPM(procHandle,address,buffer,SIZE_CHAR,ctypes.byref(bytes_read))
-	err = ctypes.get_last_error()
+	buffer = create_string_buffer(SIZE_CHAR)
+	bytes_read = c_size_t()
+	rPM(procHandle,address,buffer,SIZE_CHAR,byref(bytes_read))
+	err = get_last_error()
 	return struct.unpack("b",buffer[0:SIZE_CHAR])[0]
 	
 def readBytes(procHandle, address, length):
@@ -135,10 +136,10 @@ def readBytes(procHandle, address, length):
 	address -- address in process to read from
 	length -- number of bytes to read
 	"""
-	buffer = ctypes.create_string_buffer(length)
-	bytes_read = ctypes.c_size_t()
-	rPM(procHandle,address,buffer,length,ctypes.byref(bytes_read))
-	err = ctypes.get_last_error()
+	buffer = create_string_buffer(length)
+	bytes_read = c_size_t()
+	rPM(procHandle,address,buffer,length,byref(bytes_read))
+	err = get_last_error()
 	return bytearray(buffer[0:length])
 	
 def readFloat(procHandle, address):
@@ -149,10 +150,10 @@ def readFloat(procHandle, address):
 	procHandle -- handle to process
 	address -- address in process to read from
 	"""
-	buffer = ctypes.create_string_buffer(SIZE_FLOAT)
-	bytes_read = ctypes.c_size_t()
-	rPM(procHandle,address,buffer,SIZE_FLOAT,ctypes.byref(bytes_read))
-	err = ctypes.get_last_error()
+	buffer = create_string_buffer(SIZE_FLOAT)
+	bytes_read = c_size_t()
+	rPM(procHandle,address,buffer,SIZE_FLOAT,byref(bytes_read))
+	err = get_last_error()
 	return struct.unpack("f",buffer[0:SIZE_FLOAT])[0]
 
 def readDouble(procHandle, address):
@@ -163,10 +164,10 @@ def readDouble(procHandle, address):
 	procHandle -- handle to process
 	address -- address in process to read from
 	"""
-	buffer = ctypes.create_string_buffer(SIZE_DOUBLE)
-	bytes_read = ctypes.c_size_t()
-	rPM(procHandle,address,buffer,SIZE_DOUBLE,ctypes.byref(bytes_read))
-	err = ctypes.get_last_error()
+	buffer = create_string_buffer(SIZE_DOUBLE)
+	bytes_read = c_size_t()
+	rPM(procHandle,address,buffer,SIZE_DOUBLE,byref(bytes_read))
+	err = get_last_error()
 	return struct.unpack("d",buffer[0:SIZE_DOUBLE])[0]
 
 def writeInt(procHandle, address, value):
@@ -177,8 +178,8 @@ def writeInt(procHandle, address, value):
 	address -- address in process to write to
 	value -- value to write at [address]
 	"""
-	c_data = ctypes.c_char_p(struct.pack("i",value))
-	c_data_ = ctypes.cast(c_data,ctypes.POINTER(ctypes.c_char))
+	c_data = c_char_p(struct.pack("i",value))
+	c_data_ = cast(c_data,POINTER(c_char))
 	wPM(procHandle, address, c_data_, SIZE_INT, None)
 
 def writeShort(procHandle, address, value):
@@ -189,8 +190,8 @@ def writeShort(procHandle, address, value):
 	address -- address in process to write to
 	value -- value to write at [address]
 	"""
-	c_data = ctypes.c_char_p(struct.pack("h",value))
-	c_data_ = ctypes.cast(c_data,ctypes.POINTER(ctypes.c_char))
+	c_data = c_char_p(struct.pack("h",value))
+	c_data_ = cast(c_data,POINTER(c_char))
 	wPM(procHandle, address, c_data_, SIZE_SHORT, None)
 
 def writeFloat(procHandle, address, value):
@@ -201,8 +202,8 @@ def writeFloat(procHandle, address, value):
 	address -- address in process to write to
 	value -- value to write at [address]
 	"""
-	c_data = ctypes.c_char_p(struct.pack("f",value))
-	c_data_ = ctypes.cast(c_data,ctypes.POINTER(ctypes.c_char))
+	c_data = c_char_p(struct.pack("f",value))
+	c_data_ = cast(c_data,POINTER(c_char))
 	wPM(procHandle, address, c_data_, SIZE_FLOAT, None)
 
 def writeDouble(procHandle, address, value):
@@ -213,8 +214,8 @@ def writeDouble(procHandle, address, value):
 	address -- address in process to write to
 	value -- value to write at [address]
 	"""
-	c_data = ctypes.c_char_p(struct.pack("d",value))
-	c_data_ = ctypes.cast(c_data,ctypes.POINTER(ctypes.c_char))
+	c_data = c_char_p(struct.pack("d",value))
+	c_data_ = cast(c_data,POINTER(c_char))
 	wPM(procHandle, address, c_data_, SIZE_DOUBLE, None)
 	
 def writeByte(procHandle, address, value):
@@ -225,8 +226,8 @@ def writeByte(procHandle, address, value):
 	address -- address in process to write to
 	value -- value to write at [address]
 	"""
-	c_data = ctypes.c_char_p(struct.pack("b",value))
-	c_data_ = ctypes.cast(c_data,ctypes.POINTER(ctypes.c_char))
+	c_data = c_char_p(struct.pack("b",value))
+	c_data_ = cast(c_data,POINTER(c_char))
 	wPM(procHandle, address, c_data_, SIZE_CHAR, None)
 	
 def writeBytes(procHandle, address, buffer):
@@ -237,21 +238,31 @@ def writeBytes(procHandle, address, buffer):
 	address -- address in process to write to
 	buffer -- a bytearray or bytes object to write at [address]
 	"""
-	c_data = ctypes.c_char_p(bytes(buffer))
-	c_data_ = ctypes.cast(c_data,ctypes.POINTER(ctypes.c_char))
+	c_data = c_char_p(bytes(buffer))
+	c_data_ = cast(c_data,POINTER(c_char))
 	wPM(procHandle, address, c_data_, len(buffer), None)
 
-def resolvePointer(procHandle, base_address, offset_list):
-	"""Resolves a pointer or multi-level pointer to an address.
+def resolveMultiPointer(procHandle, base_address, offset_list):
+	"""Resolves a multi-level pointer to an address.
 	Returns an address as (int)
 	
 	Keyword arguments:
 	procHandle -- handle to process
 	base_address -- base address of pointer
-	offset_list -- a list of offsets (ints) for multi-level pointers
-	or single level pointers (one item in list)
+	offset_list -- a list of offsets (ints)
 	"""
 	resolved_ptr = base_address
 	for i in offset_list:
 		resolved_ptr = readInt(procHandle,resolved_ptr)+i
 	return resolved_ptr
+	
+def resolvePointer(procHandle, base_address, offset):
+	"""Resolves a single level pointer to an address.
+	Returns an address as (int)
+	
+	Keyword arguments:
+	procHandle -- handle to process
+	base_address -- base address of pointer
+	offset -- pointer offset
+	"""
+	return readInt(procHandle,base_address)+i
