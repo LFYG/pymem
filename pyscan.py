@@ -3,16 +3,8 @@
 #http://www.rohitab.com/discuss/topic/39525-process-memory-scannerpy/
 #credit for portions of this code go to Cadaver at
 #http://www.rohitab.com/discuss/user/14859-cadaver/
-#I want to write my version differently to cadaver
-#I also want to rewrite it so that it uses ctypes for the scanning values as well.
-#this example is quite messy, and I am going to do a lot of
-#planning and rewrite this monsta. Its not even object oriented, just a list of functions
-#pymem module was written by myself.
-#This POC was mainly me just exploring if what i wanted to do was possible in python 3.
-#also it has no proper error checking :( and niether does pymem
 
-import pymem
-import struct
+import pymem, struct
 from ctypes import *
 from ctypes.wintypes import *
 
@@ -55,7 +47,7 @@ class MEMORY_BASIC_INFORMATION(Structure):
 	("Protect", DWORD),
 	("Type", DWORD)]
 	
-class PyMEMORY_BASIC_INFORMATION:
+class Region:
 
 	def __init__ (self, MBI):
 		self.MBI = MBI
@@ -66,6 +58,10 @@ class PyMEMORY_BASIC_INFORMATION:
 		self.State = MEM_STATES.get (self.MBI.State, self.MBI.State)
 		self.Protect = MEM_PROTECTIONS.get (self.MBI.Protect, self.MBI.Protect)
 		self.Type = MEM_TYPES.get (self.MBI.Type, self.MBI.Type)
+		if(self.BaseAddress != None or self.RegionSize != None):
+			self.NextRegion = self.BaseAddress + self.RegionSize
+		else:
+			self.NextRegion = None
 	
 class SYSTEM_INFO(Structure):
     _fields_ = [
@@ -95,23 +91,23 @@ SI = SYSTEM_INFO ()
 SI_pointer = byref (SI)
 GetSystemInfo (SI_pointer)
 
-def VirtualQueryEx(procHandle, address):
+def VirtualQueryEx(process_handle, address):
 	MBI = MEMORY_BASIC_INFORMATION()
 	MBI_pointer =  byref(MBI)
 	length = sizeof(MBI)
-	VirtualQuery(procHandle,address,MBI_pointer,length)
-	return PyMEMORY_BASIC_INFORMATION(MBI)
+	VirtualQuery(process_handle,address,MBI_pointer,length)
+	return Region(MBI)
 	
-def GetMemoryRegions(procHandle):
-	region = VirtualQueryEx(procHandle, SI.MinimumApplicationAddress)
+def GetMemoryRegions(process_handle):
+	region = VirtualQueryEx(process_handle, SI.MinimumApplicationAddress)
 	memory_regions = []
 	while region.BaseAddress != None:
 		memory_regions.append(region)
-		region = VirtualQueryEx(procHandle, region.BaseAddress+region.RegionSize)
+		region = VirtualQueryEx(process_handle, region.NextRegion)
 	return memory_regions
 
-def scan_page_int(procHandle, region, value):
-	buffer = pymem.readBytes(procHandle,region.BaseAddress,region.RegionSize)
+def scan_page_int(process_handle, region, value):
+	buffer = pymem.readBytes(process_handle,region.BaseAddress,region.RegionSize)
 	length = len(buffer)
 	address_list = []
 	x = 0; y = 4
@@ -124,8 +120,8 @@ def scan_page_int(procHandle, region, value):
 		y+=4
 	return address_list
 	
-def scan_page_short(procHandle, region, value):
-	buffer = pymem.readBytes(procHandle,region.BaseAddress,region.RegionSize)
+def scan_page_short(process_handle, region, value):
+	buffer = pymem.readBytes(process_handle,region.BaseAddress,region.RegionSize)
 	length = len(buffer)
 	address_list = []
 	x = 0; y = 2
@@ -138,8 +134,8 @@ def scan_page_short(procHandle, region, value):
 		y+=2
 	return address_list
 	
-def scan_page_byte(procHandle, region, value):
-	buffer = pymem.readBytes(procHandle,region.BaseAddress,region.RegionSize)
+def scan_page_byte(process_handle, region, value):
+	buffer = pymem.readBytes(process_handle,region.BaseAddress,region.RegionSize)
 	length = len(buffer)
 	address_list = []
 	x = 0; y = 1
@@ -152,8 +148,8 @@ def scan_page_byte(procHandle, region, value):
 		y+=1
 	return address_list
 	
-def scan_page_float(procHandle, region, value):
-	buffer = pymem.readBytes(procHandle,region.BaseAddress,region.RegionSize)
+def scan_page_float(process_handle, region, value):
+	buffer = pymem.readBytes(process_handle,region.BaseAddress,region.RegionSize)
 	length = len(buffer)
 	address_list = []
 	x = 0; y = 4
@@ -166,8 +162,8 @@ def scan_page_float(procHandle, region, value):
 		y+=4
 	return address_list
 	
-def scan_page_double(procHandle, region, value):
-	buffer = pymem.readBytes(procHandle,region.BaseAddress,region.RegionSize)
+def scan_page_double(process_handle, region, value):
+	buffer = pymem.readBytes(process_handle,region.BaseAddress,region.RegionSize)
 	length = len(buffer)
 	address_list = []
 	x = 0; y = 8
@@ -180,65 +176,152 @@ def scan_page_double(procHandle, region, value):
 		y+=8
 	return address_list
 
-def init_scan(procHandle, value, scan_type, memory_protection):
-	regions = GetMemoryRegions(procHandle)
+def init_scan(process_handle, value, scan_type, memory_protection):
+	regions = GetMemoryRegions(process_handle)
 	addresses = []
 	if(scan_type == type_int):
 		for r in regions:
 			if(r.Protect == memory_protection):
-				addresses.extend(scan_page_int(procHandle,r,value))
+				addresses.extend(scan_page_int(process_handle,r,value))
 		return addresses
 	
 	if(scan_type == type_short):
 		for r in regions:
 			if(r.Protect == memory_protection):
-				addresses.extend(scan_page_short(procHandle,r,value))
+				addresses.extend(scan_page_short(process_handle,r,value))
 		return addresses
 	
 	if(scan_type == type_byte):
 		for r in regions:
 			if(r.Protect == memory_protection):
-				addresses.extend(scan_page_byte(procHandle,r,value))
+				addresses.extend(scan_page_byte(process_handle,r,value))
 		return addresses
 
 	if(scan_type == type_float):
 		for r in regions:
 			if(r.Protect == memory_protection):
-				addresses.extend(scan_page_float(procHandle,r,value))
+				addresses.extend(scan_page_float(process_handle,r,value))
 		return addresses
 
 	if(scan_type == type_double):
 		for r in regions:
 			if(r.Protect == memory_protection):
-				addresses.extend(scan_page_double(procHandle,r,value))
+				addresses.extend(scan_page_double(process_handle,r,value))
 		return addresses
 	return None
 
-def rescan_equals(procHandle, addresses, value, scan_type):
+def rescan_equal(process_handle, addresses, value, scan_type):
 	new_addresses = []
 	if(scan_type == type_int):
 		for a in addresses:
-			if(pymem.readInt(procHandle,a) == value):
+			if(pymem.readInt(process_handle,a) == value):
 				new_addresses.append(a)
 		return new_addresses
 	if(scan_type == type_short):
 		for a in addresses:
-			if(pymem.readShort(procHandle,a) == value):
+			if(pymem.readShort(process_handle,a) == value):
 				new_addresses.append(a)
 		return new_addresses
 	if(scan_type == type_byte):
 		for a in addresses:
-			if(pymem.readByte(procHandle,a) == value):
+			if(pymem.readByte(process_handle,a) == value):
 				new_addresses.append(a)
 		return new_addresses
 	if(scan_type == type_float):
 		for a in addresses:
-			if(pymem.readFloat(procHandle,a) == value):
+			if(pymem.readFloat(process_handle,a) == value):
 				new_addresses.append(a)
 		return new_addresses
 	if(scan_type == type_double):
 		for a in addresses:
-			if(pymem.readDouble(procHandle,a) == value):
+			if(pymem.readDouble(process_handle,a) == value):
+				new_addresses.append(a)
+		return new_addresses
+	return None
+	
+def rescan_not(process_handle, addresses, value, scan_type):
+	new_addresses = []
+	if(scan_type == type_int):
+		for a in addresses:
+			if(pymem.readInt(process_handle,a) != value):
+				new_addresses.append(a)
+		return new_addresses
+	if(scan_type == type_short):
+		for a in addresses:
+			if(pymem.readShort(process_handle,a) != value):
+				new_addresses.append(a)
+		return new_addresses
+	if(scan_type == type_byte):
+		for a in addresses:
+			if(pymem.readByte(process_handle,a) != value):
+				new_addresses.append(a)
+		return new_addresses
+	if(scan_type == type_float):
+		for a in addresses:
+			if(pymem.readFloat(process_handle,a) != value):
+				new_addresses.append(a)
+		return new_addresses
+	if(scan_type == type_double):
+		for a in addresses:
+			if(pymem.readDouble(process_handle,a) != value):
+				new_addresses.append(a)
+		return new_addresses
+	return None
+
+def rescan_bigger_than(process_handle, addresses, value, scan_type):
+	new_addresses = []
+	if(scan_type == type_int):
+		for a in addresses:
+			if(pymem.readInt(process_handle,a) > value):
+				new_addresses.append(a)
+		return new_addresses
+	if(scan_type == type_short):
+		for a in addresses:
+			if(pymem.readShort(process_handle,a) > value):
+				new_addresses.append(a)
+		return new_addresses
+	if(scan_type == type_byte):
+		for a in addresses:
+			if(pymem.readByte(process_handle,a) > value):
+				new_addresses.append(a)
+		return new_addresses
+	if(scan_type == type_float):
+		for a in addresses:
+			if(pymem.readFloat(process_handle,a) > value):
+				new_addresses.append(a)
+		return new_addresses
+	if(scan_type == type_double):
+		for a in addresses:
+			if(pymem.readDouble(process_handle,a) > value):
+				new_addresses.append(a)
+		return new_addresses
+	return None
+	
+def rescan_less_than(process_handle, addresses, value, scan_type):
+	new_addresses = []
+	if(scan_type == type_int):
+		for a in addresses:
+			if(pymem.readInt(process_handle,a) < value):
+				new_addresses.append(a)
+		return new_addresses
+	if(scan_type == type_short):
+		for a in addresses:
+			if(pymem.readShort(process_handle,a) < value):
+				new_addresses.append(a)
+		return new_addresses
+	if(scan_type == type_byte):
+		for a in addresses:
+			if(pymem.readByte(process_handle,a) < value):
+				new_addresses.append(a)
+		return new_addresses
+	if(scan_type == type_float):
+		for a in addresses:
+			if(pymem.readFloat(process_handle,a) < value):
+				new_addresses.append(a)
+		return new_addresses
+	if(scan_type == type_double):
+		for a in addresses:
+			if(pymem.readDouble(process_handle,a) < value):
 				new_addresses.append(a)
 		return new_addresses
 	return None
