@@ -11,23 +11,23 @@ Full Docstring documentation coming soon™....<br>
 # pymem User Functions
 ```python
 
-openProc(pid)
-openProcName(name)
-closeProc(process_handle)
-readInt(process_handle, address)
-readShort(process_handle, address)
-readByte(process_handle, address)
-readBytes(process_handle, address, length)
-readFloat(process_handle, address)
-readDouble(process_handle, address)
-writeInt(process_handle, address, value)
-writeShort(process_handle, address, value)
-writeFloat(process_handle, address, value)
-writeDouble(process_handle, address, value)
-writeByte(process_handle, address, value)
-writeBytes(process_handle, address, buffer)
-resolvePointer(process_handle, base_address, offset)
-resolveMultiPointer(process_handle, base_address, offset_list)
+def openProc(pid)
+def openProcName(name)
+def closeProc(process_handle)
+def readInt(process_handle, address)
+def readShort(process_handle, address)
+def readByte(process_handle, address)
+def readBytes(process_handle, address, length)
+def readFloat(process_handle, address)
+def readDouble(process_handle, address)
+def writeInt(process_handle, address, value)
+def writeShort(process_handle, address, value)
+def writeFloat(process_handle, address, value)
+def writeDouble(process_handle, address, value)
+def writeByte(process_handle, address, value)
+def writeBytes(process_handle, address, buffer)
+def resolvePointer(process_handle, base_address, offset)
+def resolveMultiPointer(process_handle, base_address, offset_list)
 ```
 # pymem Internal Functions
 ```python
@@ -44,21 +44,21 @@ Currently very slow and poorly written<br>
 
 # pyscan User Functions
 ```python
-init_scan(process_handle, value, scan_type, memory_protection)
-scan_page_int(process_handle, region, value)
-scan_page_short(process_handle, region, value)
-scan_page_byte(process_handle, region, value)
-scan_page_float(process_handle, region, value)
-scan_page_double(process_handle, region, value)
-rescan_equal(process_handle, addresses, value, scan_type)
-rescan_not(process_handle, addresses, value, scan_type)
-rescan_bigger_than(process_handle, addresses, value, scan_type)
-rescan_less_than(process_handle, addresses, value, scan_type)
+def init_scan(process_handle, value, scan_type, memory_protection)
+def scan_page_int(process_handle, region, value)
+def scan_page_short(process_handle, region, value)
+def scan_page_byte(process_handle, region, value)
+def scan_page_float(process_handle, region, value)
+def scan_page_double(process_handle, region, value)
+def rescan_equal(process_handle, addresses, value, scan_type)
+def rescan_not(process_handle, addresses, value, scan_type)
+def rescan_bigger_than(process_handle, addresses, value, scan_type)
+def rescan_less_than(process_handle, addresses, value, scan_type)
 ```
 # pyscan Internal functions
 ```python
-VirtualQueryEx(process_handle, address)
-GetMemoryRegions(process_handle)
+def VirtualQueryEx(process_handle, address)
+def GetMemoryRegions(process_handle)
 ```
 along with a new module...<br>
 
@@ -67,8 +67,8 @@ A module that contains classes and functions useful for creating trainers in pyt
 Uses pymem<br>
 # ptrainer Functions and Classes
 ```python
-set_process(process)
-release_process()
+def set_process(process)
+def release_process()
 class Address()
 	__init__(self, address, type)
 	read(self)
