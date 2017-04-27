@@ -1,12 +1,9 @@
 # pymem
 Proof of concept python module for read/write to process memory<br>
-
-Abstracts and simplifies the use of win32 api<br><br>
-In order to read and write memory of processes<br>
+Abstracts and simplifies the use of win32 api in order to read and write memory of processes<br>
 Python programs that import pymem need to be run with Administrator privileges<br>
 This limitation does not have a workaround currently<br>
 <br>
-Full Docstring documentation coming soon™....<br>
 
 # pymem User Functions
 ```python
