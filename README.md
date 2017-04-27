@@ -5,8 +5,10 @@ Abstracts and simplifies the use of win32 api<br><br>
 In order to read and write memory of processes<br>
 Python programs that import pymem need to be run with Administrator privileges<br>
 This limitation does not have a workaround currently<br>
+<br>
+Full Docstring documentation coming soon™....<br>
 
-# Functions
+# pymem User Functions
 openProc(pid)<br>
 openProcName(name)<br>
 closeProc(process_handle)<br>
@@ -24,12 +26,20 @@ writeByte(process_handle, address, value)<br>
 writeBytes(process_handle, address, buffer)<br>
 resolvePointer(process_handle, base_address, offset)<br>
 resolveMultiPointer(process_handle, base_address, offset_list):<br>
-<br>
+
+# pymem Internal Functions
+OpenProcess(pid)<br>
+CloseHandle(handle)<br>
+rPM(procHandle,address,buffer,length,bytes_read)<br>
+wPM(procHandle,address,c_data, length,bytes_written)<br><br>
+
 and a sister project...<br>
 # pyscan
 Proof of concept memory scanner module for python (like cheat engine). Relies on mempy<br>
 Currently very slow and poorly written<br>
-# pyscan Functions
+
+# pyscan User Functions
+init_scan(process_handle, value, scan_type, memory_protection)<br>
 scan_page_int(process_handle, region, value)<br>
 scan_page_short(process_handle, region, value)<br>
 scan_page_byte(process_handle, region, value)<br>
@@ -38,9 +48,14 @@ scan_page_double(process_handle, region, value)<br>
 rescan_equal(process_handle, addresses, value, scan_type)<br>
 rescan_not(process_handle, addresses, value, scan_type)<br>
 rescan_bigger_than(process_handle, addresses, value, scan_type)<br>
-rescan_less_than(process_handle, addresses, value, scan_type)<br><br>
+rescan_less_than(process_handle, addresses, value, scan_type)<br>
+
+# pyscan Internal functions
+VirtualQueryEx(process_handle, address)<br>
+GetMemoryRegions(process_handle)<br>
 
 along with a new module...<br>
+
 # pytrainer
 A module that contains classes and functions useful for creating trainers in python<br>
 Uses pymem<br>
@@ -68,3 +83,4 @@ class Patch()<br>
 	__init__(self, address, patch_bytes)<br>
 	patch_bytes()<br>
 	restore_bytes()<br>
+
