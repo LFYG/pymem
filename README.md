@@ -62,7 +62,7 @@ along with a new module...<br>
 # pytrainer
 A module that contains classes and functions useful for creating trainers in python<br>
 Uses pymem<br>
-# ptrainer Functions and Classes
+# pytrainer Functions and Classes
 ```python
 def set_process(process)
 def release_process()
