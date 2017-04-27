@@ -28,7 +28,7 @@ resolveMultiPointer(process_handle, base_address, offset_list):<br>
 and a sister project...<br>
 # pyscan
 Proof of concept memory scanner module for python (like cheat engine). Relies on mempy<br>
-
+Currently very slow and poorly written<br>
 # pyscan Functions
 scan_page_int(process_handle, region, value)<br>
 scan_page_short(process_handle, region, value)<br>
@@ -38,4 +38,33 @@ scan_page_double(process_handle, region, value)<br>
 rescan_equal(process_handle, addresses, value, scan_type)<br>
 rescan_not(process_handle, addresses, value, scan_type)<br>
 rescan_bigger_than(process_handle, addresses, value, scan_type)<br>
-rescan_less_than(process_handle, addresses, value, scan_type)<br>
+rescan_less_than(process_handle, addresses, value, scan_type)<br><br>
+
+along with a new module...<br>
+# pytrainer
+A module that contains classes and functions useful for creating trainers in python<br>
+Uses pymem<br>
+# ptrainer Functions and Classes
+set_process(process)<br>
+release_process()<br>
+class Address()<br>
+	__init__(self, address, type)<br>
+	read(self)<br>
+	write(self, value)<br>
+	lock(self, value, interval = 0.25)<br>
+	unlock(self)<br>
+	<br>
+class Pointer()<br>
+	__init__(self, base_address, offset_list, type)<br>
+	resolve(self)<br>
+	read(self)<br>
+	write(self, value)<br>
+	resolve_and_read(self)<br>
+	resolve_and_write(self, value)<br>
+	lock(self, value, interval = 0.25)<br>
+	unlock(self)<br>
+	<br>
+class Patch()<br>
+	__init__(self, address, patch_bytes)<br>
+	patch_bytes()<br>
+	restore_bytes()<br>
