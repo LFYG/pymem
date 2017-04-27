@@ -60,52 +60,22 @@ class Address():
 	def lock(self, value, interval = 0.25):
 		if(self.locked!=True):
 			self.locked=True
-			self.lock_thread = Thread(target = _lock_, args = ([value,interval]) )
+			self.lock_thread = Thread(target = self._lock_, args = ([value,interval]) )
+			self.lock_thread.daemon = True
 			self.lock_thread.start()
 		
 	def unlock(self):
 		self.locked = False
 
-class Pointer():
+class Pointer(Address):
 	def __init__(self, base_address, offset_list, type):
+		super(Pointer, self).__init__(0,type)
 		self.base_address = base_address
 		self.offset_list = offset_list
-		self.type = type
-		self.size = sizeof_type.get(type)
-		self.resolved_address = 0
 		self.resolve()
-		self.lock_thread = None
-		self.locked = False
-		
-	def __exit__(self, exc_type, exc_value, traceback):
-		self.unlock()
 	
 	def resolve(self):
-		self.resolved_address = pymem.resolveMultiPointer(process_handle, self.base_address, self.offset_list)
-	
-	def read(self):
-		if(self.type == 'int'):
-			self.value = pymem.readInt(process_handle, self.resolved_address)
-		if(self.type == 'short'):
-			self.value = pymem.readShort(process_handle, self.resolved_address)
-		if(self.type == 'byte'):
-			self.value = pymem.readByte(process_handle, self.resolved_address)
-		if(self.type == 'float'):
-			self.value = pymem.readFloat(process_handle, self.resolved_address)
-		if(self.type == 'double'):
-			self.value = pymem.readDouble(process_handle, self.resolved_address)
-		
-	def write(self, value):
-		if(self.type == 'int'):
-			pymem.writeInt(process_handle, self.resolved_address, value)
-		if(self.type == 'short'):
-			pymem.writeShort(process_handle, self.resolved_address, value)
-		if(self.type == 'byte'):
-			pymem.writeByte(process_handle, self.resolved_address, value)
-		if(self.type == 'float'):
-			pymem.writeFloat(process_handle, self.resolved_address, value)
-		if(self.type == 'double'):
-			pymem.writeDouble(process_handle, self.resolved_address, value)
+		self.address = pymem.resolveMultiPointer(process_handle, self.base_address, self.offset_list)
 	
 	def resolve_and_read(self):
 		self.resolve()
@@ -114,21 +84,6 @@ class Pointer():
 	def resolve_and_write(self, value):
 		self.resolve()
 		self.write(value)
-
-	def _lock_(self, value, interval = 0.25):
-		while self.locked==True:
-			self.write(value)
-			sleep(interval)
-
-	def lock(self, value, interval = 0.25):
-		if(self.locked!=True):
-			self.locked=True
-			self.lock_thread = Thread(target = self._lock_, args = ([value, interval]) )
-			self.lock_thread.daemon = True
-			self.lock_thread.start()
-		
-	def unlock(self):
-		self.locked = False
 
 class Patch():
 	def __init__(self, address, patch_bytes):
