@@ -9,78 +9,85 @@ This limitation does not have a workaround currently<br>
 Full Docstring documentation coming soon™....<br>
 
 # pymem User Functions
-openProc(pid)<br>
-openProcName(name)<br>
-closeProc(process_handle)<br>
-readInt(process_handle, address)<br>
-readShort(process_handle, address)<br>
-readByte(process_handle, address)<br>
-readBytes(process_handle, address, length)<br>
-readFloat(process_handle, address)<br>
-readDouble(process_handle, address)<br>
-writeInt(process_handle, address, value)<br>
-writeShort(process_handle, address, value)<br>
-writeFloat(process_handle, address, value)<br>
-writeDouble(process_handle, address, value)<br>
-writeByte(process_handle, address, value)<br>
-writeBytes(process_handle, address, buffer)<br>
-resolvePointer(process_handle, base_address, offset)<br>
-resolveMultiPointer(process_handle, base_address, offset_list):<br>
+```python
 
+openProc(pid)
+openProcName(name)
+closeProc(process_handle)
+readInt(process_handle, address)
+readShort(process_handle, address)
+readByte(process_handle, address)
+readBytes(process_handle, address, length)
+readFloat(process_handle, address)
+readDouble(process_handle, address)
+writeInt(process_handle, address, value)
+writeShort(process_handle, address, value)
+writeFloat(process_handle, address, value)
+writeDouble(process_handle, address, value)
+writeByte(process_handle, address, value)
+writeBytes(process_handle, address, buffer)
+resolvePointer(process_handle, base_address, offset)
+resolveMultiPointer(process_handle, base_address, offset_list)
+```
 # pymem Internal Functions
-OpenProcess(pid)<br>
-CloseHandle(handle)<br>
-rPM(procHandle,address,buffer,length,bytes_read)<br>
-wPM(procHandle,address,c_data, length,bytes_written)<br><br>
+```python
 
+OpenProcess(pid)
+CloseHandle(handle)
+rPM(procHandle,address,buffer,length,bytes_read)
+wPM(procHandle,address,c_data, length,bytes_written)
+```
 and a sister project...<br>
 # pyscan
 Proof of concept memory scanner module for python (like cheat engine). Relies on mempy<br>
 Currently very slow and poorly written<br>
 
 # pyscan User Functions
-init_scan(process_handle, value, scan_type, memory_protection)<br>
-scan_page_int(process_handle, region, value)<br>
-scan_page_short(process_handle, region, value)<br>
-scan_page_byte(process_handle, region, value)<br>
-scan_page_float(process_handle, region, value)<br>
-scan_page_double(process_handle, region, value)<br>
-rescan_equal(process_handle, addresses, value, scan_type)<br>
-rescan_not(process_handle, addresses, value, scan_type)<br>
-rescan_bigger_than(process_handle, addresses, value, scan_type)<br>
-rescan_less_than(process_handle, addresses, value, scan_type)<br>
-
+```python
+init_scan(process_handle, value, scan_type, memory_protection)
+scan_page_int(process_handle, region, value)
+scan_page_short(process_handle, region, value)
+scan_page_byte(process_handle, region, value)
+scan_page_float(process_handle, region, value)
+scan_page_double(process_handle, region, value)
+rescan_equal(process_handle, addresses, value, scan_type)
+rescan_not(process_handle, addresses, value, scan_type)
+rescan_bigger_than(process_handle, addresses, value, scan_type)
+rescan_less_than(process_handle, addresses, value, scan_type)
+```
 # pyscan Internal functions
-VirtualQueryEx(process_handle, address)<br>
-GetMemoryRegions(process_handle)<br>
-
+```python
+VirtualQueryEx(process_handle, address)
+GetMemoryRegions(process_handle)
+```
 along with a new module...<br>
 
 # pytrainer
 A module that contains classes and functions useful for creating trainers in python<br>
 Uses pymem<br>
 # ptrainer Functions and Classes
-set_process(process)<br>
-release_process()<br>
-class Address()<br>
-	__init__(self, address, type)<br>
-	read(self)<br>
-	write(self, value)<br>
-	lock(self, value, interval = 0.25)<br>
-	unlock(self)<br>
-	<br>
-class Pointer()<br>
-	__init__(self, base_address, offset_list, type)<br>
-	resolve(self)<br>
-	read(self)<br>
-	write(self, value)<br>
-	resolve_and_read(self)<br>
-	resolve_and_write(self, value)<br>
-	lock(self, value, interval = 0.25)<br>
-	unlock(self)<br>
-	<br>
-class Patch()<br>
-	__init__(self, address, patch_bytes)<br>
-	patch_bytes()<br>
-	restore_bytes()<br>
-
+```python
+set_process(process)
+release_process()
+class Address()
+	__init__(self, address, type)
+	read(self)
+	write(self, value)
+	lock(self, value, interval = 0.25)
+	unlock(self)
+	
+class Pointer()
+	__init__(self, base_address, offset_list, type)
+	resolve(self)
+	read(self)
+	write(self, value)
+	resolve_and_read(self)
+	resolve_and_write(self, value)
+	lock(self, value, interval = 0.25)
+	unlock(self)
+	
+class Patch()
+	__init__(self, address, patch_bytes)<
+	patch_bytes()
+	restore_bytes()
+```
