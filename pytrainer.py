@@ -1,10 +1,11 @@
 import pymem
 from time import sleep
 from threading import Thread
+
 process_handle = 0
 sizeof_type = {'int':4, 'short':2, 'byte':1, 'float':4, 'double':8}
 
-def set_process(process):
+def attach_process(process):
 	global process_handle
 	if(type(process) == int):
 		process_handle = pymem.openProc(process)
@@ -52,12 +53,12 @@ class Address():
 		if(self.type == 'double'):
 			pymem.writeDouble(process_handle, self.address, value)
 			
-	def _lock_(self, value, interval = 0.25):
+	def _lock_(self, value, interval = 0.1):
 		while self.locked==True:
 			self.write(value)
 			sleep(interval)
 
-	def lock(self, value, interval = 0.25):
+	def lock(self, value, interval = 0.1):
 		if(self.locked!=True):
 			self.locked=True
 			self.lock_thread = Thread(target = self._lock_, args = ([value,interval]) )
@@ -92,8 +93,8 @@ class Patch():
 		self.length = len(patch_bytes)
 		self.original_bytes = pymem.readBytes(process_handle, self.address, self.length)
 		
-	def patch_bytes():
+	def patch(self):
 		pymem.writeBytes(process_handle, self.address, self.patch_bytes)
 		
-	def restore_bytes():
+	def restore_bytes(self):
 		pymem.writeBytes(process_handle, self.address, self.original_bytes)

@@ -1,4 +1,4 @@
-#Proof of concept (not very good) memory scanner for python 3
+#Proof of concept (not very good) memory scanner for python 3 and its slow
 #reference code by Cadaver (for python 2.7), (WHICH IS HUGELY BETTER THAN MY CODE)
 #http://www.rohitab.com/discuss/topic/39525-process-memory-scannerpy/
 #credit for portions of this code go to Cadaver at
@@ -58,7 +58,7 @@ class Region:
 		self.State = MEM_STATES.get (self.MBI.State, self.MBI.State)
 		self.Protect = MEM_PROTECTIONS.get (self.MBI.Protect, self.MBI.Protect)
 		self.Type = MEM_TYPES.get (self.MBI.Type, self.MBI.Type)
-		if(self.BaseAddress != None or self.RegionSize != None):
+		if(self.BaseAddress != None and self.RegionSize != None):
 			self.NextRegion = self.BaseAddress + self.RegionSize
 		else:
 			self.NextRegion = None
@@ -108,10 +108,9 @@ def GetMemoryRegions(process_handle):
 
 def scan_page_int(process_handle, region, value):
 	buffer = pymem.readBytes(process_handle,region.BaseAddress,region.RegionSize)
-	length = len(buffer)
 	address_list = []
 	x = 0; y = 4
-	while(y/4<length):
+	while(y/4<region.RegionSize):
 		if(buffer[x:y]!=b''):
 			compare = struct.unpack("i",buffer[x:y])[0]
 		if(compare == value):
@@ -122,10 +121,9 @@ def scan_page_int(process_handle, region, value):
 	
 def scan_page_short(process_handle, region, value):
 	buffer = pymem.readBytes(process_handle,region.BaseAddress,region.RegionSize)
-	length = len(buffer)
 	address_list = []
 	x = 0; y = 2
-	while(y/2<length):
+	while(y/2<region.RegionSize):
 		if(buffer[x:y]!=b''):
 			compare = struct.unpack("h",buffer[x:y])[0]
 		if(compare == value):
@@ -136,10 +134,9 @@ def scan_page_short(process_handle, region, value):
 	
 def scan_page_byte(process_handle, region, value):
 	buffer = pymem.readBytes(process_handle,region.BaseAddress,region.RegionSize)
-	length = len(buffer)
 	address_list = []
 	x = 0; y = 1
-	while(y<length):
+	while(y<region.RegionSize):
 		if(buffer[x:y]!=b''):
 			compare = struct.unpack("b",buffer[x:y])[0]
 		if(compare == value):
@@ -150,10 +147,9 @@ def scan_page_byte(process_handle, region, value):
 	
 def scan_page_float(process_handle, region, value):
 	buffer = pymem.readBytes(process_handle,region.BaseAddress,region.RegionSize)
-	length = len(buffer)
 	address_list = []
 	x = 0; y = 4
-	while(y/4<length):
+	while(y/4<region.RegionSize):
 		if(buffer[x:y]!=b''):
 			compare = struct.unpack("f",buffer[x:y])[0]
 		if(compare == value):
@@ -164,10 +160,9 @@ def scan_page_float(process_handle, region, value):
 	
 def scan_page_double(process_handle, region, value):
 	buffer = pymem.readBytes(process_handle,region.BaseAddress,region.RegionSize)
-	length = len(buffer)
 	address_list = []
 	x = 0; y = 8
-	while(y/8<length):
+	while(y/8<region.RegionSize):
 		if(buffer[x:y]!=b''):
 			compare = struct.unpack("d",buffer[x:y])[0]
 		if(compare == value):
