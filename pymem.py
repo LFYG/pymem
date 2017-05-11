@@ -1,20 +1,15 @@
-#proof of concept memory read/write module
-#external dependencies include psutil (install with pip/pip3)
-#or disable openProcName and remove psutil import
-import struct, psutil
-from ctypes import *
-from ctypes.wintypes import *
+#!/usr/bin/env python
 """
 Memory read/write module for Python 3x (untested with 2x)
-Abstracts and simplifies the use of win32 api
-in order to read and write memory of processes
+Abstracts the use of win32 api in order to
+read and write memory of processes
 Does not need to be run with Administrator privileges,
 unless you want to access memory of privileged programs
 
 WARNING: You can damage your system and lose data
 when messing with memory. Be careful.
 
-Also note that read and write have a some overhead (slow functions).
+Also note that generally read and write have a some small overhead.
 Module Functions:
 openProc(pid)
 openProcName(name)
@@ -37,7 +32,21 @@ resolveMultiPointer(process_handle, base_address, offset_list):
 resolvePointer(process_handle, base_address, offset):
 """
 
-#Define constants
+import struct
+from ctypes import *
+from ctypes.wintypes import *
+
+import psutil
+
+__author__ = "SamsonPianoFingers"
+__credits__ = ["SamsonPianoFingers"]
+__license__ = "GPL"
+__version__ = "0.1"
+__maintainer__ = "SamsonPianoFingers"
+__email__ = "itsthatguyagain3@gmail.com"
+__status__ = "Prototype"
+
+#constants
 SIZE_DOUBLE = 8
 SIZE_LONGLONG = 8
 SIZE_FLOAT = 4;
@@ -47,7 +56,6 @@ SIZE_SHORT = 2;
 SIZE_CHAR = 1
 
 #error code list - > https://msdn.microsoft.com/en-us/library/windows/desktop/ms681382(v=vs.85).aspx
-#feel free to add if you come across any other error codes
 ERR_CODE = {
 5: "ERROR_ACCESS_DENIED",
 6:"ERROR_INVALID_HANDLE",
