@@ -42,7 +42,7 @@ __author__ = "SamsonPianoFingers"
 __credits__ = ["SamsonPianoFingers"]
 __license__ = "GPL"
 __version__ = "0.1"
-__maintainer__ = "SamsonPianoddFingers"
+__maintainer__ = "SamsonPianoFingers"
 __email__ = "itsthatguyagain3@gmail.com"
 __status__ = "Prototype"
 
