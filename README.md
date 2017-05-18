@@ -1,8 +1,8 @@
 # pymem
 Proof of concept python module for read/write to process memory<br>
 Abstracts and simplifies the use of win32 api in order to read and write memory of processes<br>
-Python programs that import pymem need to be run with Administrator privileges<br>
-This limitation does not have a workaround currently<br>
+Only supports windows currently - working on linux version.
+Support for other OS's will have to wait for a while.
 <br>
 
 # pymem User Functions
@@ -60,11 +60,11 @@ def GetMemoryRegions(process_handle)
 along with a new module...<br>
 
 # pytrainer
-A module that contains classes and functions useful for creating trainers in python<br>
+A module for creating trainers in python<br>
 Uses pymem<br>
 # pytrainer Functions and Classes
 ```python
-def set_process(process)
+def attach_process(process)
 def release_process()
 class Address()
 	__init__(self, address, type)
