@@ -85,6 +85,6 @@ class Pointer()
 	
 class Patch()
 	__init__(self, address, patch_bytes)
-	patch_bytes()
+	patch()
 	restore_bytes()
 ```
