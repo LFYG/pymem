@@ -1,9 +1,11 @@
-# !/usr/bin/env python
 """
+Memory read/write module for Python 3x
 Abstracts the use of win32 api in order to
 read and write memory of processes
 Does not need to be run with Administrator privileges,
 unless you want to access memory of privileged programs
+
+using a process handle of -1 will read/write python's own memory
 
 WARNING: You can damage your system and lose data
 when messing with memory. Be careful.
@@ -32,6 +34,14 @@ resolvePointer(process_handle, base_address, offset):
 """
 
 import struct
+# Using explicit imports
+from ctypes import c_char_p, c_size_t, c_char,\
+     windll, WinDLL, POINTER, \
+     get_last_error, set_last_error,\
+     create_string_buffer, byref,\
+     cast
+
+from ctypes.wintypes import HANDLE, LPVOID, LPCVOID, BOOL
 
 import psutil
 
@@ -53,6 +63,7 @@ SIZE_INT = 4
 SIZE_SHORT = 2
 SIZE_CHAR = 1
 
+# windows error code list - >
 # msdn.microsoft.com/en-us/library/windows/desktop/ms681382(v=vs.85).aspx
 ERR_CODE = {
     5: "ERROR_ACCESS_DENIED",
@@ -78,6 +89,7 @@ CloseHandle = windll.kernel32.CloseHandle
 
 
 def openProc(pid):
+    """Gets a handle to the process id (pid) of the target process
     Returns the handle (int), on failure returns -1
 
     Keyword arguments:
@@ -91,6 +103,13 @@ def openProc(pid):
 
 
 def openProcName(name):
+    """Gets a handle to the first process found with specified name
+    Process names are case sensitive
+    Returns the handle (int), on failure returns -1
+
+    Keyword arguments:
+    pid -- process id of process to open (int)
+    """
     for i in psutil.process_iter():
         if(i.name() == name):
             return openProc(i.pid)
