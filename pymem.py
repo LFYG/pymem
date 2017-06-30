@@ -1,6 +1,5 @@
 # !/usr/bin/env python
 """
-Memory read/write module for Python 3x (untested with 2x)
 Abstracts the use of win32 api in order to
 read and write memory of processes
 Does not need to be run with Administrator privileges,
@@ -33,8 +32,6 @@ resolvePointer(process_handle, base_address, offset):
 """
 
 import struct
-from ctypes import *
-from ctypes.wintypes import *
 
 import psutil
 
@@ -56,7 +53,6 @@ SIZE_INT = 4
 SIZE_SHORT = 2
 SIZE_CHAR = 1
 
-# win error code list - >
 # msdn.microsoft.com/en-us/library/windows/desktop/ms681382(v=vs.85).aspx
 ERR_CODE = {
     5: "ERROR_ACCESS_DENIED",
@@ -82,7 +78,6 @@ CloseHandle = windll.kernel32.CloseHandle
 
 
 def openProc(pid):
-    """Creates a handle to the process id (pid) of the target process
     Returns the handle (int), on failure returns -1
 
     Keyword arguments:
