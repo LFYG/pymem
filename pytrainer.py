@@ -128,7 +128,7 @@ class Pointer(Address):
         these are: 'byte', 'short', 'int, 'float, 'double'
         process -- a process object
         """
-        super(Pointer, self).__init__(0, type_t)
+        super(Pointer, self).__init__(0, type_t, process)
         self.base_address = base_address
         self.offset_list = offset_list
         self.resolve()
