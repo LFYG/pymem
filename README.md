@@ -5,86 +5,37 @@ Only supports windows currently - working on linux version.
 Support for other OS's will have to wait for a while.
 <br>
 
-# pymem User Functions
+# pymem module API
 ```python
 
-def openProc(pid)
-def openProcName(name)
-def closeProc(process_handle)
-def readInt(process_handle, address)
-def readShort(process_handle, address)
-def readByte(process_handle, address)
-def readBytes(process_handle, address, length)
-def readFloat(process_handle, address)
-def readDouble(process_handle, address)
-def writeInt(process_handle, address, value)
-def writeShort(process_handle, address, value)
-def writeFloat(process_handle, address, value)
-def writeDouble(process_handle, address, value)
-def writeByte(process_handle, address, value)
-def writeBytes(process_handle, address, buffer)
-def resolvePointer(process_handle, base_address, offset)
-def resolveMultiPointer(process_handle, base_address, offset_list)
+open_process(pid)
+open_process_name(name)
+close_process(process_handle)
+read_integer(process_handle, address)
+read_short(process_handle, address)
+read_byte(process_handle, address)
+read_bytes(process_handle, address, length)
+read_float(process_handle, address)
+read_double(process_handle, address)
+write_integer(process_handle, address, value)
+write_short(process_handle, address, value)
+write_float(process_handle, address, value)
+write_double(process_handle, address, value)
+write_byte(process_handle, address, value)
+write_bytes(process_handle, address, buffer)
+resolve_multi_pointer(process_handle, base_address, offset)
+resolve_pointer(process_handle, base_address, offset_list)
 ```
 # pymem Internal Functions
 ```python
 
 OpenProcess(pid)
-CloseHandle(handle)
-rPM(procHandle,address,buffer,length,bytes_read)
-wPM(procHandle,address,c_data, length,bytes_written)
+__CloseHandle__(handle)
+__rPM__(process_handle ,address, buffer, length, bytes_read)
+__wPM__(process_handle ,address, c_data, length, bytes_written)
 ```
 and a sister project...<br>
-# pyscan
-Proof of concept memory scanner module for python (like cheat engine). Relies on mempy<br>
-Currently very slow and poorly written<br>
-
-# pyscan User Functions
-```python
-def init_scan(process_handle, value, scan_type, memory_protection)
-def scan_page_int(process_handle, region, value)
-def scan_page_short(process_handle, region, value)
-def scan_page_byte(process_handle, region, value)
-def scan_page_float(process_handle, region, value)
-def scan_page_double(process_handle, region, value)
-def rescan_equal(process_handle, addresses, value, scan_type)
-def rescan_not(process_handle, addresses, value, scan_type)
-def rescan_bigger_than(process_handle, addresses, value, scan_type)
-def rescan_less_than(process_handle, addresses, value, scan_type)
-```
-# pyscan Internal functions
-```python
-def VirtualQueryEx(process_handle, address)
-def GetMemoryRegions(process_handle)
-```
-along with a new module...<br>
 
 # pytrainer
 A module for creating trainers in python<br>
 Uses pymem<br>
-# pytrainer Functions and Classes
-```python
-def attach_process(process)
-def release_process()
-class Address()
-	__init__(self, address, type)
-	read(self)
-	write(self, value)
-	lock(self, value, interval = 0.25)
-	unlock(self)
-	
-class Pointer()
-	__init__(self, base_address, offset_list, type)
-	resolve(self)
-	read(self)
-	write(self, value)
-	resolve_and_read(self)
-	resolve_and_write(self, value)
-	lock(self, value, interval = 0.25)
-	unlock(self)
-	
-class Patch()
-	__init__(self, address, patch_bytes)
-	patch()
-	restore_bytes()
-```

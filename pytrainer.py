@@ -31,13 +31,13 @@ class Process():
         "Attach to a process"
         self.process = process
         if isinstance(process, int):
-            self.process_handle = pymem.openProc(process)
+            self.process_handle = pymem.open_process(process)
         elif isinstance(process, str):
-            self.process_handle = pymem.openProcName(process)
+            self.process_handle = pymem.open_process_name(process)
 
     def close_process(self):
         """Close the current process"""
-        pymem.closeProc(self.process.process_handle)
+        pymem.close_process(self.process.process_handle)
 
 class Address():
     """Memory address class"""
@@ -67,30 +67,30 @@ class Address():
         Returns the data that was read.
         """
         if self.type_t == 'int':
-            self.value = pymem.readInt(self.process.process_handle, self.address)
+            self.value = pymem.read_integer(self.process.process_handle, self.address)
         elif self.type_t == 'short':
-            self.value = pymem.readShort(self.process.process_handle, self.address)
+            self.value = pymem.read_short(self.process.process_handle, self.address)
         elif self.type_t == 'byte':
-            self.value = pymem.readByte(self.process.process_handle, self.address)
+            self.value = pymem.read_byte(self.process.process_handle, self.address)
         elif self.type_t == 'float':
-            self.value = pymem.readFloat(self.process.process_handle, self.address)
+            self.value = pymem.read_float(self.process.process_handle, self.address)
         elif self.type_t == 'double':
-            self.value = pymem.readDouble(self.process.process_handle, self.address)
+            self.value = pymem.read_double(self.process.process_handle, self.address)
         return self.value
 
     def write(self, value):
         """Writes a value to self.address in remote process
         """
         if self.type_t == 'int':
-            pymem.writeInt(self.process.process_handle, self.address, value)
+            pymem.write_integer(self.process.process_handle, self.address, value)
         elif self.type_t == 'short':
-            pymem.writeShort(self.process.process_handle, self.address, value)
+            pymem.write_short(self.process.process_handle, self.address, value)
         elif self.type_t == 'byte':
-            pymem.writeByte(self.process.process_handle, self.address, value)
+            pymem.write_byte(self.process.process_handle, self.address, value)
         elif self.type_t == 'float':
-            pymem.writeFloat(self.process.process_handle, self.address, value)
+            pymem.write_float(self.process.process_handle, self.address, value)
         elif self.type_t == 'double':
-            pymem.writeDouble(self.process.process_handle, self.address, value)
+            pymem.write_double(self.process.process_handle, self.address, value)
 
     def _lock_(self, value, interval=0.1):
         while self.locked is True:
@@ -135,7 +135,7 @@ class Pointer(Address):
 
     def resolve(self):
         """Resolves the pointer and caches it for read/write"""
-        self.address = pymem.resolveMultiPointer(
+        self.address = pymem.resolve_multi_pointer(
             self.process.process_handle, self.base_address, self.offset_list)
 
     def resolve_and_read(self):
@@ -166,17 +166,17 @@ class Patch():
         self.patch_bytes = patch_bytes
         self.length = len(patch_bytes)
         self.process = process
-        self.original_bytes = pymem.readBytes(
+        self.original_bytes = pymem.read_bytes(
             self.process.process_handle, self.address, self.length
         )
 
     def patch(self):
         """Applies patch to memory"""
-        pymem.writeBytes(self.process.process_handle, self.address, self.patch_bytes)
+        pymem.write_bytes(self.process.process_handle, self.address, self.patch_bytes)
 
     def restore(self):
         """Restores original bytes, removing the patch"""
-        pymem.writeBytes(self.process.process_handle, self.address, self.original_bytes)
+        pymem.write_bytes(self.process.process_handle, self.address, self.original_bytes)
 
 
 class PatchGroup():

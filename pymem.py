@@ -11,35 +11,15 @@ WARNING: You can damage your system and lose data
 when messing with memory. Be careful.
 
 Also note that generally read and write have a some small overhead.
-Module Functions:
-openProc(pid)
-openProcName(name)
-closeProc(process_handle)
-
-readInt(process_handle, address)
-readShort(process_handle, address)
-readByte(process_handle, address)
-readBytes(process_handle, address, length)
-readFloat(process_handle, address)
-readDouble(process_handle, address)
-
-writeInt(process_handle, address, value)
-writeShort(process_handle, address, value)
-writeFloat(process_handle, address, value)
-writeDouble(process_handle, address, value)
-writeByte(process_handle, address, value)
-writeBytes(process_handle, address, buffer)
-resolveMultiPointer(process_handle, base_address, offset_list):
-resolvePointer(process_handle, base_address, offset):
 """
 
 import struct
 # Using explicit imports
 from ctypes import c_char_p, c_size_t, c_char,\
-     windll, WinDLL, POINTER, \
-     get_last_error, set_last_error,\
-     create_string_buffer, byref,\
-     cast
+    windll, WinDLL, POINTER, \
+    get_last_error, set_last_error,\
+    create_string_buffer, byref,\
+    cast
 
 from ctypes.wintypes import HANDLE, LPVOID, LPCVOID, BOOL
 
@@ -76,56 +56,55 @@ ERR_CODE = {
 
 
 # Create w32api references
-rPM = WinDLL('kernel32', use_last_error=True).ReadProcessMemory
-rPM.argtypes = [HANDLE, LPCVOID, LPVOID, c_size_t, POINTER(c_size_t)]
-rPM.restype = BOOL
+__rPM__ = WinDLL('kernel32', use_last_error=True).ReadProcessMemory
+__rPM__.argtypes = [HANDLE, LPCVOID, LPVOID, c_size_t, POINTER(c_size_t)]
+__rPM__.restype = BOOL
 
-wPM = WinDLL('kernel32', use_last_error=True).WriteProcessMemory
-wPM.argtypes = [HANDLE, LPVOID, LPCVOID, c_size_t, POINTER(c_size_t)]
-wPM.restype = BOOL
+__wPM__ = WinDLL('kernel32', use_last_error=True).WriteProcessMemory
+__wPM__.argtypes = [HANDLE, LPVOID, LPCVOID, c_size_t, POINTER(c_size_t)]
+__wPM__.restype = BOOL
 
-OpenProcess = windll.kernel32.OpenProcess
-CloseHandle = windll.kernel32.CloseHandle
+__OpenProcess__ = windll.kernel32.OpenProcess
+__CloseHandle__ = windll.kernel32.CloseHandle
 
 
-def openProc(pid):
+def open_process(pid):
     """Gets a handle to the process id (pid) of the target process
-    Returns the handle (int), on failure returns -1
+    Returns the handle (int), on failure returns None
 
     Keyword arguments:
     pid -- process id of process to open (int)
     """
-    process_handle = OpenProcess(PROCESS_ALL_ACCESS, 0, pid)
-    if(process_handle != 0):
+    process_handle = __OpenProcess__(PROCESS_ALL_ACCESS, 0, pid)
+    if process_handle != 0:
         return process_handle
-    else:
-        return -1
+    return None
 
 
-def openProcName(name):
+def open_process_name(name):
     """Gets a handle to the first process found with specified name
     Process names are case sensitive
-    Returns the handle (int), on failure returns -1
+    Returns the handle (int), on failure returns None
 
     Keyword arguments:
     pid -- process id of process to open (int)
     """
     for i in psutil.process_iter():
-        if(i.name() == name):
-            return openProc(i.pid)
-    return -1
+        if i.name() == name:
+            return open_process(i.pid)
+    return None
 
 
-def closeProc(process_handle):
+def close_process(process_handle):
     """Closes the handle to a process
 
     Keyword arguments:
     process_handle -- handle to process
     """
-    CloseHandle(process_handle)
+    __CloseHandle__(process_handle)
 
 
-def readInt(process_handle, address):
+def read_integer(process_handle, address):
     """Reads an int at a specified address from a process
     Returns an int which is the value at [address]
 
@@ -135,15 +114,15 @@ def readInt(process_handle, address):
     """
     buffer = create_string_buffer(SIZE_INT)
     bytes_read = c_size_t()
-    rPM(process_handle, address, buffer, SIZE_INT, byref(bytes_read))
+    __rPM__(process_handle, address, buffer, SIZE_INT, byref(bytes_read))
     err = get_last_error()
-    if(err):
+    if err:
         set_last_error(0)
         print(ERR_CODE.get(err, err))
     return struct.unpack("I", buffer[0:SIZE_INT])[0]
 
 
-def readShort(process_handle, address):
+def read_short(process_handle, address):
     """Reads an short at a specified address from a process
     Returns an short which is the value at [address]
 
@@ -153,15 +132,15 @@ def readShort(process_handle, address):
     """
     buffer = create_string_buffer(SIZE_SHORT)
     bytes_read = c_size_t()
-    rPM(process_handle, address, buffer, SIZE_SHORT, byref(bytes_read))
+    __rPM__(process_handle, address, buffer, SIZE_SHORT, byref(bytes_read))
     err = get_last_error()
-    if(err):
+    if err:
         set_last_error(0)
         print(ERR_CODE.get(err, err))
     return struct.unpack("H", buffer[0:SIZE_SHORT])[0]
 
 
-def readByte(process_handle, address):
+def read_byte(process_handle, address):
     """Reads a single byte at a specified address from a process
     Returns an byte which is the value at [address]
 
@@ -171,15 +150,15 @@ def readByte(process_handle, address):
     """
     buffer = create_string_buffer(SIZE_CHAR)
     bytes_read = c_size_t()
-    rPM(process_handle, address, buffer, SIZE_CHAR, byref(bytes_read))
+    __rPM__(process_handle, address, buffer, SIZE_CHAR, byref(bytes_read))
     err = get_last_error()
-    if(err):
+    if err:
         set_last_error(0)
         print(ERR_CODE.get(err, err))
     return struct.unpack("B", buffer[0:SIZE_CHAR])[0]
 
 
-def readBytes(process_handle, address, length):
+def read_bytes(process_handle, address, length):
     """Reads an array of bytes at a specified address from a process
     Returns a list which is values at [address], with a length of [length]
 
@@ -190,15 +169,15 @@ def readBytes(process_handle, address, length):
     """
     buffer = create_string_buffer(length)
     bytes_read = c_size_t()
-    rPM(process_handle, address, buffer, length, byref(bytes_read))
+    __rPM__(process_handle, address, buffer, length, byref(bytes_read))
     err = get_last_error()
-    if(err):
+    if err:
         set_last_error(0)
         print(ERR_CODE.get(err, err))
     return bytearray(buffer[0:length])
 
 
-def readFloat(process_handle, address):
+def read_float(process_handle, address):
     """Reads a single float at a specified address from a process
     Returns an float which is the value at [address]
 
@@ -208,15 +187,16 @@ def readFloat(process_handle, address):
     """
     buffer = create_string_buffer(SIZE_FLOAT)
     bytes_read = c_size_t()
-    rPM(process_handle, address, buffer, SIZE_FLOAT, byref(bytes_read))
+    __rPM__(process_handle, address, buffer, SIZE_FLOAT, byref(bytes_read))
     err = get_last_error()
     set_last_error(0)
-    if(err):
+    if err:
+        set_last_error(0)
         print(ERR_CODE.get(err, err))
     return struct.unpack("f", buffer[0:SIZE_FLOAT])[0]
 
 
-def readDouble(process_handle, address):
+def read_double(process_handle, address):
     """Reads a single double at a specified address from a process
     Returns an double which is the value at [address]
 
@@ -226,15 +206,15 @@ def readDouble(process_handle, address):
     """
     buffer = create_string_buffer(SIZE_DOUBLE)
     bytes_read = c_size_t()
-    rPM(process_handle, address, buffer, SIZE_DOUBLE, byref(bytes_read))
+    __rPM__(process_handle, address, buffer, SIZE_DOUBLE, byref(bytes_read))
     err = get_last_error()
-    if(err):
+    if err:
         set_last_error(0)
         print(ERR_CODE.get(err, err))
     return struct.unpack("d", buffer[0:SIZE_DOUBLE])[0]
 
 
-def writeInt(process_handle, address, value):
+def write_integer(process_handle, address, value):
     """Writes a single int at a specified address in a process
 
     Keyword arguments:
@@ -244,14 +224,14 @@ def writeInt(process_handle, address, value):
     """
     c_data = c_char_p(struct.pack("I", value))
     c_data_ = cast(c_data, POINTER(c_char))
-    wPM(process_handle, address, c_data_, SIZE_INT, None)
+    __wPM__(process_handle, address, c_data_, SIZE_INT, None)
     err = get_last_error()
-    if(err):
+    if err:
         set_last_error(0)
         print(ERR_CODE.get(err, err))
 
 
-def writeShort(process_handle, address, value):
+def write_short(process_handle, address, value):
     """Writes a single short at a specified address in a process
 
     Keyword arguments:
@@ -261,14 +241,14 @@ def writeShort(process_handle, address, value):
     """
     c_data = c_char_p(struct.pack("H", value))
     c_data_ = cast(c_data, POINTER(c_char))
-    wPM(process_handle, address, c_data_, SIZE_SHORT, None)
+    __wPM__(process_handle, address, c_data_, SIZE_SHORT, None)
     err = get_last_error()
-    if(err):
+    if err:
         set_last_error(0)
         print(ERR_CODE.get(err, err))
 
 
-def writeFloat(process_handle, address, value):
+def write_float(process_handle, address, value):
     """Writes a single float at a specified address in a process
 
     Keyword arguments:
@@ -278,14 +258,14 @@ def writeFloat(process_handle, address, value):
     """
     c_data = c_char_p(struct.pack("f", value))
     c_data_ = cast(c_data, POINTER(c_char))
-    wPM(process_handle, address, c_data_, SIZE_FLOAT, None)
+    __wPM__(process_handle, address, c_data_, SIZE_FLOAT, None)
     err = get_last_error()
-    if(err):
+    if err:
         set_last_error(0)
         print(ERR_CODE.get(err, err))
 
 
-def writeDouble(process_handle, address, value):
+def write_double(process_handle, address, value):
     """Writes a single double at a specified address in a process
 
     Keyword arguments:
@@ -295,14 +275,14 @@ def writeDouble(process_handle, address, value):
     """
     c_data = c_char_p(struct.pack("d", value))
     c_data_ = cast(c_data, POINTER(c_char))
-    wPM(process_handle, address, c_data_, SIZE_DOUBLE, None)
+    __wPM__(process_handle, address, c_data_, SIZE_DOUBLE, None)
     err = get_last_error()
-    if(err):
+    if err:
         set_last_error(0)
         print(ERR_CODE.get(err, err))
 
 
-def writeByte(process_handle, address, value):
+def write_byte(process_handle, address, value):
     """Writes a single byte at a specified address in a process
 
     Keyword arguments:
@@ -312,14 +292,14 @@ def writeByte(process_handle, address, value):
     """
     c_data = c_char_p(struct.pack("B", value))
     c_data_ = cast(c_data, POINTER(c_char))
-    wPM(process_handle, address, c_data_, SIZE_CHAR, None)
+    __wPM__(process_handle, address, c_data_, SIZE_CHAR, None)
     err = get_last_error()
-    if(err):
+    if err:
         set_last_error(0)
         print(ERR_CODE.get(err, err))
 
 
-def writeBytes(process_handle, address, buffer):
+def write_bytes(process_handle, address, buffer):
     """Writes a buffer (number of bytes) to a specified address in a process
 
     Keyword arguments:
@@ -329,14 +309,14 @@ def writeBytes(process_handle, address, buffer):
     """
     c_data = c_char_p(bytes(buffer))
     c_data_ = cast(c_data, POINTER(c_char))
-    wPM(process_handle, address, c_data_, len(buffer), None)
+    __wPM__(process_handle, address, c_data_, len(buffer), None)
     err = get_last_error()
-    if(err):
+    if err:
         set_last_error(0)
         print(ERR_CODE.get(err, err))
 
 
-def resolveMultiPointer(process_handle, base_address, offset_list):
+def resolve_multi_pointer(process_handle, base_address, offset_list):
     """Resolves a multi-level pointer to an address.
     Returns an address as (int)
 
@@ -347,11 +327,11 @@ def resolveMultiPointer(process_handle, base_address, offset_list):
     """
     resolved_ptr = base_address
     for i in offset_list:
-        resolved_ptr = readInt(process_handle, resolved_ptr) + i
+        resolved_ptr = read_integer(process_handle, resolved_ptr) + i
     return resolved_ptr
 
 
-def resolvePointer(process_handle, base_address, offset):
+def resolve_pointer(process_handle, base_address, offset):
     """Resolves a single level pointer to an address.
     Returns an address as (int)
 
@@ -360,4 +340,4 @@ def resolvePointer(process_handle, base_address, offset):
     base_address -- base address of pointer
     offset -- pointer offset
     """
-    return readInt(process_handle, base_address) + i
+    return read_integer(process_handle, base_address) + offset
