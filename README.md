@@ -1,3 +1,10 @@
+# Closure of this project - to the few that knew about it
+ I'm sorry to say that this project has now been closed but will stay available for reference.
+ 
+ It was fun to make and exciting to explore this field of programming
+ 
+ The closure is due to the realisation that this far better project exists: https://github.com/srounet/Pymem
+
 # pymem
 Proof of concept python module for read/write to process memory<br>
 Abstracts and simplifies the use of win32 api in order to read and write memory of processes<br>
@@ -34,8 +41,11 @@ __CloseHandle__(handle)
 __rPM__(process_handle ,address, buffer, length, bytes_read)
 __wPM__(process_handle ,address, c_data, length, bytes_written)
 ```
-and a sister project...<br>
+and sister projects...<br>
 
 # pytrainer
 A module for creating trainers in python<br>
 Uses pymem<br>
+
+# pyregion
+A module for getting information on memory regions in processes
