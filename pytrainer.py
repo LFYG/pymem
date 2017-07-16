@@ -1,6 +1,6 @@
 """
 Module for creating trainers for games or programs
-Only attaches to a single process at a time
+can even be used to access multiple processes
 NOTE:
 the type_t argument in Address.__init__ and Pointer.__init__ is a string
 e.g 'int' or 'float' or 'byte'
@@ -14,14 +14,14 @@ import pymem
 __author__ = "SamsonPianoFingers"
 __credits__ = ["SamsonPianoFingers"]
 __license__ = "GPL"
-__version__ = "0.01"
+__version__ = "0.03"
 __maintainer__ = "SamsonPianoFingers"
 __email__ = "itsthatguyagain3@gmail.com"
 __status__ = "Prototype"
 
 __sizeof_type__ = {'int': 4, 'short': 2, 'byte': 1, 'float': 4, 'double': 8}
 
-class Process():
+class Process:
     """Object that contains information on a process
     Keyword arguments:
     process -- pid (int) or process name (str)"""
@@ -39,7 +39,7 @@ class Process():
         """Close the current process"""
         pymem.close_process(self.process.process_handle)
 
-class Address():
+class Address:
     """Memory address class"""
 
     def __init__(self, address, type_t, process):
@@ -153,7 +153,7 @@ class Pointer(Address):
         self.write(value)
 
 
-class Patch():
+class Patch:
     """Memory patching class"""
 
     def __init__(self, address, patch_bytes, process):
@@ -179,7 +179,7 @@ class Patch():
         pymem.write_bytes(self.process.process_handle, self.address, self.original_bytes)
 
 
-class PatchGroup():
+class PatchGroup:
     """Keeps a list of related patches, and patches them all at the same time
     Keyword arguments:
     patch_list -- a list of Patch objects

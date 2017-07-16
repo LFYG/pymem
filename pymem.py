@@ -28,7 +28,7 @@ import psutil
 __author__ = "SamsonPianoFingers"
 __credits__ = ["SamsonPianoFingers"]
 __license__ = "GPL"
-__version__ = "0.1"
+__version__ = "1.1"
 __maintainer__ = "SamsonPianoFingers"
 __email__ = "itsthatguyagain3@gmail.com"
 __status__ = "Prototype"
@@ -53,6 +53,11 @@ ERR_CODE = {
     487: "ERROR_INVALID_ADDRESS",
     998: "ERROR_NOACCESS"
 }
+
+# ACCESS_DENIED is a priveledge issue
+# INVALID_HANDLE means process handle is not valid
+# PARTIAL_COPY means that either some or none of the memory was copied
+# this may be because memory is not committed at that address
 
 
 # Create w32api references
@@ -118,7 +123,7 @@ def read_integer(process_handle, address):
     err = get_last_error()
     if err:
         set_last_error(0)
-        print(ERR_CODE.get(err, err))
+        #print(ERR_CODE.get(err, err))
     return struct.unpack("I", buffer[0:SIZE_INT])[0]
 
 
@@ -136,7 +141,7 @@ def read_short(process_handle, address):
     err = get_last_error()
     if err:
         set_last_error(0)
-        print(ERR_CODE.get(err, err))
+        #print(ERR_CODE.get(err, err))
     return struct.unpack("H", buffer[0:SIZE_SHORT])[0]
 
 
@@ -154,7 +159,7 @@ def read_byte(process_handle, address):
     err = get_last_error()
     if err:
         set_last_error(0)
-        print(ERR_CODE.get(err, err))
+        #print(ERR_CODE.get(err, err))
     return struct.unpack("B", buffer[0:SIZE_CHAR])[0]
 
 
@@ -173,7 +178,7 @@ def read_bytes(process_handle, address, length):
     err = get_last_error()
     if err:
         set_last_error(0)
-        print(ERR_CODE.get(err, err))
+        #print(ERR_CODE.get(err, err))
     return bytearray(buffer[0:length])
 
 
@@ -192,7 +197,7 @@ def read_float(process_handle, address):
     set_last_error(0)
     if err:
         set_last_error(0)
-        print(ERR_CODE.get(err, err))
+        #print(ERR_CODE.get(err, err))
     return struct.unpack("f", buffer[0:SIZE_FLOAT])[0]
 
 
@@ -210,7 +215,7 @@ def read_double(process_handle, address):
     err = get_last_error()
     if err:
         set_last_error(0)
-        print(ERR_CODE.get(err, err))
+        #print(ERR_CODE.get(err, err))
     return struct.unpack("d", buffer[0:SIZE_DOUBLE])[0]
 
 
@@ -228,7 +233,7 @@ def write_integer(process_handle, address, value):
     err = get_last_error()
     if err:
         set_last_error(0)
-        print(ERR_CODE.get(err, err))
+        #print(ERR_CODE.get(err, err))
 
 
 def write_short(process_handle, address, value):
@@ -245,7 +250,7 @@ def write_short(process_handle, address, value):
     err = get_last_error()
     if err:
         set_last_error(0)
-        print(ERR_CODE.get(err, err))
+        #print(ERR_CODE.get(err, err))
 
 
 def write_float(process_handle, address, value):
@@ -262,7 +267,7 @@ def write_float(process_handle, address, value):
     err = get_last_error()
     if err:
         set_last_error(0)
-        print(ERR_CODE.get(err, err))
+        #print(ERR_CODE.get(err, err))
 
 
 def write_double(process_handle, address, value):
@@ -279,7 +284,7 @@ def write_double(process_handle, address, value):
     err = get_last_error()
     if err:
         set_last_error(0)
-        print(ERR_CODE.get(err, err))
+        #print(ERR_CODE.get(err, err))
 
 
 def write_byte(process_handle, address, value):
@@ -296,7 +301,7 @@ def write_byte(process_handle, address, value):
     err = get_last_error()
     if err:
         set_last_error(0)
-        print(ERR_CODE.get(err, err))
+        #print(ERR_CODE.get(err, err))
 
 
 def write_bytes(process_handle, address, buffer):
@@ -313,7 +318,7 @@ def write_bytes(process_handle, address, buffer):
     err = get_last_error()
     if err:
         set_last_error(0)
-        print(ERR_CODE.get(err, err))
+        #print(ERR_CODE.get(err, err))
 
 
 def resolve_multi_pointer(process_handle, base_address, offset_list):
